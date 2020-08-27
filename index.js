@@ -9,6 +9,7 @@ async function run() {
         console.log(`Hello ${nameToGreet}!`);
         const time = (new Date()).toTimeString();
         core.setOutput("time", time);
+        console.log("token:", githubToken)
         const octokit = github.getOctokit(githubToken);
         const team = await octokit.teams.getByName('obg-fe-adaptive-release-gatekeepers');
         console.log("Team:", team)
