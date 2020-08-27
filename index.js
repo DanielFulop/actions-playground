@@ -11,7 +11,10 @@ async function run() {
         core.setOutput("time", time);
         console.log("token:", githubToken)
         const octokit = github.getOctokit(githubToken);
-        const team = await octokit.teams.getByName('obg-fe-adaptive-release-gatekeepers');
+        const team = await octokit.teams.getByName({
+            org: 'BetssonGroup',
+            team_slug: 'obg-fe-adaptive-release-gatekeepers'
+        });
         console.log("Team:", team)
         core.setFailed('Mocking a fail')
     } catch (error) {
