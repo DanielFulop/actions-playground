@@ -16,9 +16,19 @@ async function run() {
             team_slug: 'obg-fe-adaptive-release-gatekeepers'
         });
         const context = github.context.payload;
-        console.log("context:", context)
+        const repo = context.repository.name;
+        const owner = context.repository.owner;
+        const pull_number = context.pull_request.number;
 
-        const url = team.data.members_url;
+        const reviews = await octokit.pulls.listReviews({
+            owner,
+            repo,
+            pull_number
+        })
+
+        console.log("reviews:", reviews)
+
+
         console.log("Team:", team)
         core.setFailed('Mocking a fail')
     } catch (error) {
