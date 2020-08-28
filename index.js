@@ -11,10 +11,11 @@ async function run() {
         core.setOutput("time", time);
         console.log("token:", githubToken)
         const octokit = github.getOctokit(githubToken);
-        const team = await octokit.teams.getByName({
+        const team = await octokit.teams.listMembersInOrg({
             org: 'BetssonGroup',
             team_slug: 'obg-fe-adaptive-release-gatekeepers'
         });
+        const url = team.data.members_url;
         console.log("Team:", team)
         core.setFailed('Mocking a fail')
     } catch (error) {
