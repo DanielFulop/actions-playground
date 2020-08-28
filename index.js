@@ -15,6 +15,9 @@ async function run() {
             org: 'BetssonGroup',
             team_slug: 'obg-fe-adaptive-release-gatekeepers'
         });
+        const context = github.context.payload;
+        console.log("context:", context)
+
         const url = team.data.members_url;
         console.log("Team:", team)
         core.setFailed('Mocking a fail')
