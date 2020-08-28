@@ -19,6 +19,7 @@ async function run() {
         const repo = context.repository.name;
         const owner = context.repository.owner;
         const pull_number = context.pull_request.number;
+        console.log("details:", repo, owner, pull_number)
 
         const reviews = await octokit.pulls.listReviews({
             owner,
