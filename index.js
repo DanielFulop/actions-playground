@@ -33,7 +33,9 @@ async function run() {
             return acc;
         }, [])
 
-        const isApprovedByPersonFromTeam = latestReviewsPerPerson.some(review => !!team.data.find(person => review.user.login === person.login))
+        console.log("Latest Reviews:", latestReviewsPerPerson);
+
+        const isApprovedByPersonFromTeam = latestReviewsPerPerson.some(review => !!team.data.find(person => review.user.login === person.login && review.state === 'APPROVED'))
 
         if (isApprovedByPersonFromTeam) {
             return true;
