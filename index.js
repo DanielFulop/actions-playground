@@ -4,11 +4,7 @@ const github = require('@actions/github');
 async function run() {
     try {
         // `who-to-greet` input defined in action metadata file
-        const nameToGreet = core.getInput('who-to-greet');
         const githubToken = core.getInput('github-token');
-        console.log(`Hello ${nameToGreet}!`);
-        const time = (new Date()).toTimeString();
-        core.setOutput("time", time);
         console.log("token:", githubToken)
         const octokit = github.getOctokit(githubToken);
         const team = await octokit.teams.listMembersInOrg({
@@ -28,10 +24,24 @@ async function run() {
         })
 
         console.log("reviews:", reviews)
-
-
         console.log("Team:", team)
-        core.setFailed('Mocking a fail')
+
+        const latestReviewsPerPerson = reviews.data.reverse().reduce((acc, curr) => {
+            if (!acc.find(review => review.user.login === curr.user.login)) {
+                acc.push(curr)
+            }
+            return acc;
+        }, [])
+
+        const isApprovedByPersonFromTeam = latestReviewsPerPerson.some(review => !!team.data.find(person => review.user.login === person.login))
+
+        if (isApprovedByPersonFromTeam) {
+            return true;
+        } else {
+            core.setFailed('Not approved from team.')
+        }
+
+
     } catch (error) {
         core.setFailed(error.message);
     }
