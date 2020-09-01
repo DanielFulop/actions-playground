@@ -1,21 +1,25 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
+const ORG_SLUG = 'BetssonGroup';
+const TEAM_SLUG = 'obg-fe-adaptive-release-gatekeepers';
+
 async function run() {
     try {
-        // `who-to-greet` input defined in action metadata file
+        /* An access token provided in the workflow main.yml */
         const githubToken = core.getInput('github-token');
-        console.log("token:", githubToken)
-        const octokit = github.getOctokit(githubToken);
-        const team = await octokit.teams.listMembersInOrg({
-            org: 'BetssonGroup',
-            team_slug: 'obg-fe-adaptive-release-gatekeepers'
-        });
+
         const context = github.context.payload;
         const repo = context.repository.name;
         const owner = context.repository.owner.login;
         const pull_number = context.pull_request.number;
-        console.log("details:", repo, owner, pull_number)
+
+        const octokit = github.getOctokit(githubToken);
+
+        const team = await octokit.teams.listMembersInOrg({
+            org: ORG_SLUG,
+            team_slug: TEAM_SLUG
+        });
 
         const reviews = await octokit.pulls.listReviews({
             owner,
@@ -23,9 +27,11 @@ async function run() {
             pull_number
         })
 
-        console.log("reviews:", reviews)
-        console.log("Team:", team)
-
+        /*
+         * `reviews` is chronologically ordered,
+         *  each person can have multiple reviews,
+         *  but we only care about the last
+         */
         const latestReviewsPerPerson = reviews.data.reverse().reduce((acc, curr) => {
             if (!acc.find(review => review.user.login === curr.user.login)) {
                 acc.push(curr)
@@ -33,17 +39,13 @@ async function run() {
             return acc;
         }, [])
 
-        console.log("Latest Reviews:", latestReviewsPerPerson);
-
         const isApprovedByPersonFromTeam = latestReviewsPerPerson.some(review => !!team.data.find(person => review.user.login === person.login && review.state === 'APPROVED'))
 
         if (isApprovedByPersonFromTeam) {
             return true;
         } else {
-            core.setFailed('Not approved from team.')
+            core.setFailed(`This PR needs an approve from anyone in team '${TEAM_SLUG}' before it can be merged.`)
         }
-
-
     } catch (error) {
         core.setFailed(error.message);
     }

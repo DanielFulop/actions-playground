@@ -1,21 +1,13 @@
-# Hello world javascript action
+# Release Gatekeeper Check
 
-This action prints "Hello World" or "Hello" + the name of a person to greet to the log.
+This action checks if the PR has approves from the release GK group.
 
 ## Inputs
 
-### `who-to-greet`
+### `github-token`
 
-**Required** The name of the person to greet. Default `"World"`.
-
-## Outputs
-
-### `time`
-
-The time we greeted you.
+**Required** Personal access token to github. Once this actions is moved to the organization, ${{ secrets.GITHUB_TOKEN }} can be used in the workflow's main.yml
 
 ## Example usage
 
-uses: actions/hello-world-javascript-action@v1
-with:
-  who-to-greet: 'Mona the Octocat'
+https://github.com/DanielFulop/test-repository
